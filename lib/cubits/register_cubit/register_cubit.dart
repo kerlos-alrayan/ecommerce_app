@@ -10,6 +10,15 @@ class RegisterCubit extends Cubit<RegisterState> {
 
   static RegisterCubit get(context) => BlocProvider.of(context);
 
+  final Dio dio = Dio(
+    BaseOptions(
+      baseUrl: ApiConstants.BASEURL,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    ),
+  );
+
   void userRegister({
     required String name,
     required String phone,
@@ -19,44 +28,53 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(RegisterLoading());
 
     try {
-      var response = await Dio().post(
+      Response response = await dio.post(
         ApiConstants.REGISTER,
         data: {
           "name": name,
           "phone": phone,
           "email": email,
           "password": password,
-          "image": "https://images.pexels.com/photos/3792581/pexels-photo-3792581.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+          "image":
+          "https://images.pexels.com/photos/3792581/pexels-photo-3792581.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
         },
       );
 
+      print("Response Data: ${response.data}");
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Successful registration
         UserModel userModel = UserModel.fromJson(response.data);
         emit(RegisterSuccess(userModel));
       } else {
-        // Unexpected response
         emit(RegisterFailure("Unexpected error: ${response.statusCode}"));
       }
     } on DioError catch (error) {
       if (error.response != null) {
-        if (error.response!.statusCode == 400) {
-          emit(RegisterFailure("Invalid registration data. Please check your inputs."));
-        } else if (error.response!.statusCode == 404) {
-          emit(RegisterFailure("Server not found. Try again later."));
-        } else if (error.response!.statusCode == 409) {
-          emit(RegisterFailure("Email or phone number already exists."));
-        } else if (error.response!.statusCode == 500) {
-          emit(RegisterFailure("Server error. Please try again later."));
-        } else {
-          emit(RegisterFailure("Error: ${error.response!.statusCode}"));
+        print("DioError Response: ${error.response!.data}");
+
+        switch (error.response!.statusCode) {
+          case 400:
+            emit(RegisterFailure("Invalid data. Check your inputs."));
+            break;
+          case 404:
+            emit(RegisterFailure("Server not found. Try again later."));
+            break;
+          case 409:
+            emit(RegisterFailure("Email or phone number already exists."));
+            break;
+          case 500:
+            emit(RegisterFailure("Server error. Please try again later."));
+            break;
+          default:
+            emit(RegisterFailure("Error: ${error.response!.statusCode}"));
         }
       } else {
-        emit(RegisterFailure("Network error. Please check your connection."));
+        print("Network Error: ${error.message}");
+        emit(RegisterFailure("Network error. Check your connection."));
       }
     } catch (error) {
+      print("Unexpected Error: $error");
       emit(RegisterFailure("An unexpected error occurred: $error"));
     }
   }
-
 }

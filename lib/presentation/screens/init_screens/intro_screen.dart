@@ -1,6 +1,5 @@
+import 'package:lafyuu/presentation/screens/auth_screens/login_screen.dart';
 import 'package:lafyuu/presentation/screens/home_screen.dart';
-import 'package:lafyuu/presentation/screens/login_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class IntroScreen extends StatelessWidget {
@@ -9,7 +8,6 @@ class IntroScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot){
           if(snapshot.data != null){
             print('Its Dooooooooooooooooooooooooooooooooooooon');
@@ -18,7 +16,7 @@ class IntroScreen extends StatelessWidget {
             print('Its Noooooooooooooooooooooooot Don');
             return LoginScreen();
           }
-        }
+        }, stream: null,
     );
   }
 }

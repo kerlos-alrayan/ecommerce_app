@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:lafyuu/models/product_category_model.dart';
-import 'package:lafyuu/presentation/screens/single_product_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/single_product_screen.dart';
 import 'package:lafyuu/repository/category_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';

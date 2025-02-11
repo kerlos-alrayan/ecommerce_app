@@ -11,8 +11,8 @@ class LoginModel {
 
   factory LoginModel.fromJson(Map<String, dynamic> json) {
     return LoginModel(
-      status: json['status'],
-      message: json['message'],
+      status: json['status'] ?? false,
+      message: json['message'] ?? 'No message',
       data: json['data'] != null ? UserData.fromJson(json['data']) : null,
     );
   }
@@ -41,14 +41,14 @@ class UserData {
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      phone: json['phone'],
-      image: json['image'],
-      points: json['points'],
-      credit: json['credit'],
-      token: json['token'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? 'Unknown',
+      email: json['email'] ?? 'No email',
+      phone: json['phone'] ?? 'No phone',
+      image: json['image'] ?? '',
+      points: json['points'] ?? 0,
+      credit: json['credit'] ?? 0,
+      token: json['token'] ?? '',
     );
   }
 }

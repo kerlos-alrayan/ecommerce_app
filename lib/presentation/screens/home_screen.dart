@@ -1,8 +1,8 @@
-import 'package:lafyuu/presentation/screens/account_screen.dart';
-import 'package:lafyuu/presentation/screens/cart_screen.dart';
-import 'package:lafyuu/presentation/screens/explore_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/account_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/cart_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/explore_screen.dart';
 import 'package:lafyuu/presentation/screens/main_screen.dart';
-import 'package:lafyuu/presentation/screens/offer_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/offer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

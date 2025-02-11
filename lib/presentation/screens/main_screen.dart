@@ -1,16 +1,12 @@
-import 'package:dio/dio.dart';
 import 'package:lafyuu/cubits/home_products_cubit/home_product_cubit.dart';
-import 'package:lafyuu/presentation/screens/category_screen.dart';
-import 'package:lafyuu/presentation/screens/flash_sale_screen.dart';
-import 'package:lafyuu/presentation/screens/single_product_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/flash_sale_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/single_product_screen.dart';
 import 'package:lafyuu/presentation/widgets/categories_widget.dart';
 import 'package:lafyuu/presentation/widgets/product_widget.dart';
 import 'package:lafyuu/presentation/widgets/text_more.dart';
-import 'package:lafyuu/repository/category_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import '../../cubits/categories/categories_cubit.dart';
 import '../../cubits/categories/categories_state.dart';
@@ -51,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     // Search
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width * 0.65,
                       child: TextFormField(
                         keyboardType: TextInputType.text,
@@ -179,22 +175,24 @@ class _MainScreenState extends State<MainScreen> {
               _recomended_product(),
 
               // GridView Builder
-              BlocBuilder<HomeProductCubit, HomeProductState>(
-                  builder: (context, state) {
-                    if (state is LoadingHomeState) {
-                      return CircularProgressIndicator();
-                    }
-                    if (state is HomeDataSuccess) {
-                      final homeData = state.homeResponse.data.products;
-                      return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ProductWidget(
-                          homeData: homeData,
-                        ),
-                      );
-                    }
-                    return SizedBox();
-                  }),
+              Center(
+                child: BlocBuilder<HomeProductCubit, HomeProductState>(
+                    builder: (context, state) {
+                  if (state is LoadingHomeState) {
+                    return CircularProgressIndicator();
+                  }
+                  if (state is HomeDataSuccess) {
+                    final homeData = state.homeResponse.data.products;
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ProductWidget(
+                        homeData: homeData,
+                      ),
+                    );
+                  }
+                  return SizedBox();
+                }),
+              ),
             ],
           ),
         ),
@@ -256,48 +254,47 @@ class _MainScreenState extends State<MainScreen> {
         if (state is HomeDataSuccess) {
           final banners = state.homeResponse.data.banners;
           // final products = state.homeResponse.data.products;
-          return Container(
-            child: CarouselSlider.builder(
-                itemCount: banners.length,
-                options: CarouselOptions(
-                  viewportFraction: 1,
-                  height: 206,
-                  autoPlay: true,
-                  autoPlayInterval: Duration(seconds: 5),
-                  enableInfiniteScroll: true,
-                ),
-                itemBuilder:
-                    (BuildContext context, int itemIndex, int pageViewIndex) {
-                  final bannerItem = banners[itemIndex];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => SingleProductScreen(
-                                id: bannerItem.id,
-                                name: '',
-                              )));
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(left: 16, right: 16),
-                      child: Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(bannerItem.image),
-                                  fit: BoxFit.cover,
-                                ),
+          return CarouselSlider.builder(
+              itemCount: banners.length,
+              options: CarouselOptions(
+                viewportFraction: 1,
+                height: 206,
+                autoPlay: true,
+                autoPlayInterval: Duration(seconds: 5),
+                enableInfiniteScroll: true,
+              ),
+              itemBuilder:
+                  (BuildContext context, int itemIndex, int pageViewIndex) {
+                final bannerItem = banners[itemIndex];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SingleProductScreen(
+                              id: bannerItem.id,
+                              name: '',
+                            )));
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(left: 16, right: 16),
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              image: DecorationImage(
+                                image: NetworkImage(bannerItem.image),
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  );
-                }),
-          );
+                  ),
+                );
+              });
         }
         return SizedBox();
       },
@@ -316,7 +313,7 @@ class _MainScreenState extends State<MainScreen> {
           final homeData = state.homeResponse.data.products;
           return Container(
             margin: EdgeInsets.only(top: 12, left: 16),
-            child: Container(
+            child: SizedBox(
               height: 238,
               child: ListView.builder(
                   scrollDirection: Axis.horizontal,

@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import '../../cubits/category_product/category_product_cubit.dart';
-import '../../models/home_products_model.dart';
-import '../widgets/product_widget.dart';
+import '../../../cubits/category_product/category_product_cubit.dart';
+import '../../../models/home_products_model.dart';
+import '../../widgets/product_widget.dart';
 
 class CategoryScreen extends StatelessWidget {
   final String title;

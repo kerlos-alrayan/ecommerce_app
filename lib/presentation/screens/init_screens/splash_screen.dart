@@ -1,5 +1,7 @@
-import 'package:lafyuu/presentation/screens/intro_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:lafyuu/presentation/screens/auth_screens/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lafyuu/presentation/screens/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,11 +14,24 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 3), () {
+    navigateToNextScreen();
+  }
+
+  Future<void> navigateToNextScreen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    await Future.delayed(Duration(seconds: 3));
+
+    if (token != null && token.isNotEmpty) {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => IntroScreen()),
-          (route) => false);
-    });
+        MaterialPageRoute(builder: (context) => HomeScreen()), (Route route)=>false,
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    }
   }
 
   @override

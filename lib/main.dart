@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lafyuu/presentation/screens/init_screens/splash_screen.dart';
+import 'helper/dio_helper.dart';
 import 'package:lafyuu/cubits/bottom_bar_cubit/bottom_bar_cubit.dart';
 import 'package:lafyuu/cubits/categories/categories_cubit.dart';
 import 'package:lafyuu/cubits/category_product/category_product_cubit.dart';
@@ -5,22 +9,19 @@ import 'package:lafyuu/cubits/home_products_cubit/home_product_cubit.dart';
 import 'package:lafyuu/cubits/login_cubit/login_cubit.dart';
 import 'package:lafyuu/cubits/product_details_cubit/product_details_cubit.dart';
 import 'package:lafyuu/cubits/register_cubit/register_cubit.dart';
-import 'package:lafyuu/presentation/screens/home_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+
+  DioHelper.init();
+
+
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key,});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: HomeScreen(),
+        home: SplashScreen(),
       ),
     );
   }
