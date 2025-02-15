@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lafyuu/cubits/PasswordVisibility_cubit/PasswordVisibility_cubit.dart';
 import 'package:lafyuu/cubits/register_cubit/register_cubit.dart';
 import 'package:lafyuu/cubits/register_cubit/register_state.dart';
 import 'package:lafyuu/helper/login_helper.dart';
@@ -7,15 +8,13 @@ import 'package:lafyuu/presentation/screens/home_screen.dart';
 import 'package:lafyuu/presentation/widgets/input_text.dart';
 import 'package:flutter/material.dart';
 
-
 class RegisterScreen extends StatelessWidget {
-   RegisterScreen({super.key});
+  RegisterScreen({super.key});
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
- final  bool isPasswordObscure1 = true;
+  final bool isPasswordObscure = true;
 
- final  bool isPasswordObscure2 = true;
 
   final LoginControllers loginControllers = LoginControllers();
 
@@ -25,7 +24,7 @@ class RegisterScreen extends StatelessWidget {
       listener: (context, state) {
         if (state is RegisterSuccess) {
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("register Succeed")));
+              .showSnackBar(SnackBar(content: Text("register Succeed😉")));
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => HomeScreen()),
               (Route route) => false);
@@ -39,7 +38,8 @@ class RegisterScreen extends StatelessWidget {
           body: SafeArea(
             child: Form(
               key: formKey,
-              child: SizedBox(
+              child: Container(
+                padding: const EdgeInsets.all(24),
                 width: MediaQuery.of(context).size.width,
                 child: Center(
                   child: SingleChildScrollView(
@@ -78,68 +78,81 @@ class RegisterScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          height: 20,
+                          height: 28,
                         ),
                         // User Name
                         Column(
-                          spacing: 20,
+                          spacing: 8,
                           children: [
                             CustomTextFormField(
                               isPassword: false,
                               controller: loginControllers.nameController,
                               hintText: "Full Name",
-                              label: "Name",
-                              prefix: Icons.mail,
+                              labelText: "Name",
+                              prefixIcon: Icons.person_outline,
                               validator: (value) {
                                 if (!loginControllers.isValidName(value!)) {
                                   return "Name invalid";
                                 }
 
                                 return null;
-                              },
+                              }, textInputAction: TextInputAction.next,
                             ),
                             // Email
                             CustomTextFormField(
                               isPassword: false,
                               controller: loginControllers.emailController,
                               hintText: "Email",
-                              label: "Email",
-                              prefix: Icons.mail,
+                              labelText: "Email",
+                              prefixIcon: Icons.mail_outline,
                               validator: (value) {
                                 if (!loginControllers.isValidEmail(value!)) {
                                   return "Email invalid";
                                 }
-
                                 return null;
-                              },
+                              }, textInputAction: TextInputAction.next,
                             ),
                             // Password
-                            CustomTextFormField(
-                                isPassword: true,
-                                controller: loginControllers.passwordController,
-                                hintText: "Password",
-                                label: "Password",
-                                prefix: Icons.lock_outline,
-                                validator: (value) {
-                                  if (!loginControllers.isValidPassword(value!)) {
-                                    return "password invalid";
-                                  }
-                                  return null;
-                                }),
-                            // Password Again
+                            BlocBuilder<PasswordVisibilityCubit, bool>(
+                              builder: (context, isObscure) {
+                                return CustomTextFormField(
+                                  controller: loginControllers.passwordController,
+                                  hintText: 'Password',
+                                  labelText: 'Password',
+                                  validator: (pass) {
+                                    if (pass == null || pass.isEmpty) {
+                                      return 'Your Password cannot be empty';
+                                    } else if (pass.length <= 7) {
+                                      return 'Your Password is too weak';
+                                    }
+                                    return null;
+                                  },
+                                  prefixIcon: Icons.lock_outline_sharp,
+                                  isPassword: isObscure,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(isObscure ? Icons.visibility_off : Icons.visibility, color: Color(0xff9098B1),),
+                                    onPressed: () => context.read<PasswordVisibilityCubit>().toggle(),
+                                  ), textInputAction: TextInputAction.next,
+                                );
+                              },
+                            ),
+                            // Phone Number
                             CustomTextFormField(
                                 isPassword: false,
                                 controller: loginControllers.phoneController,
                                 hintText: "phone number",
-                                label: "phone number",
-                                prefix: Icons.lock_outline,
+                                labelText: "phone number",
+                                prefixIcon: Icons.phone_outlined,
                                 validator: (value) {
                                   if (!loginControllers.isValidPhone(value!)) {
                                     return "phone number invalid";
                                   }
                                   return null;
-                                }),
+                                }, textInputAction: TextInputAction.done,),
                           ],
+                        ),
+                        SizedBox(
+                          height: 16,
                         ),
                         // Button Sign In
                         Container(
@@ -147,7 +160,7 @@ class RegisterScreen extends StatelessWidget {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               fixedSize: Size(343, 57),
-                              shadowColor: Colors.blue,
+                              backgroundColor: Colors.blue,
                             ),
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
@@ -155,9 +168,9 @@ class RegisterScreen extends StatelessWidget {
                                   name: loginControllers.nameController.text,
                                   email: loginControllers.emailController.text,
                                   phone: loginControllers.phoneController.text,
-                                  password: loginControllers.passwordController.text,
+                                  password:
+                                      loginControllers.passwordController.text,
                                 );
-                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => HomeScreen()), (Route route) => false);
                               }
                             },
                             child: Text(
@@ -165,10 +178,14 @@ class RegisterScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w700,
-                                fontSize: 14,
+                                fontSize: 16,
+                                color: Colors.white
                               ),
                             ),
                           ),
+                        ),
+                        SizedBox(
+                          height: 24,
                         ),
                         // Register Button
                         Container(

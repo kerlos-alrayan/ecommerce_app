@@ -1,80 +1,87 @@
+import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
-import 'package:lafyuu/cubits/register_cubit/register_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lafyuu/cubits/register_cubit/register_state.dart';
+import 'package:lafyuu/helper/shared_prefs_helper.dart';
+import 'package:lafyuu/models/user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../constants/api_constants.dart';
-import '../../models/user_model.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit() : super(RegisterInitial());
 
   static RegisterCubit get(context) => BlocProvider.of(context);
 
-  final Dio dio = Dio(
-    BaseOptions(
-      baseUrl: ApiConstants.BASEURL,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    ),
-  );
-
-  void userRegister({
+  Future<void> userRegister({
     required String name,
-    required String phone,
     required String email,
     required String password,
+    required String phone,
   }) async {
     emit(RegisterLoading());
+    var dio = Dio(BaseOptions(followRedirects: false));
 
     try {
-      Response response = await dio.post(
+      print("🔵 Sending request to API...");
+      var response = await dio.post(
         ApiConstants.REGISTER,
         data: {
           "name": name,
-          "phone": phone,
           "email": email,
           "password": password,
-          "image":
-          "https://images.pexels.com/photos/3792581/pexels-photo-3792581.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+          "phone": phone,
         },
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) => status! < 500,
+          headers: {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Cookie': 'humans_21909=1',
+          },
+        ),
       );
 
-      print("Response Data: ${response.data}");
+      print("🟢 Response Status: ${response.statusCode}");
+      print("🟢 Response Headers: ${response.headers}");
+      print("🟢 Response Data: ${response.data}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         UserModel userModel = UserModel.fromJson(response.data);
-        emit(RegisterSuccess(userModel));
-      } else {
-        emit(RegisterFailure("Unexpected error: ${response.statusCode}"));
-      }
-    } on DioError catch (error) {
-      if (error.response != null) {
-        print("DioError Response: ${error.response!.data}");
 
-        switch (error.response!.statusCode) {
-          case 400:
-            emit(RegisterFailure("Invalid data. Check your inputs."));
-            break;
-          case 404:
-            emit(RegisterFailure("Server not found. Try again later."));
-            break;
-          case 409:
-            emit(RegisterFailure("Email or phone number already exists."));
-            break;
-          case 500:
-            emit(RegisterFailure("Server error. Please try again later."));
-            break;
-          default:
-            emit(RegisterFailure("Error: ${error.response!.statusCode}"));
+        String? token = userModel.data?.token;
+        if(token != null && token.isNotEmpty){
+          print("✅ Token received: $token");
+          await SharedPrefsHelper.saveToken(token);
+          print("🔹 Token saved successfully!");
         }
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token!);
+
+        emit(RegisterSuccess(userModel));
+      } else if (response.statusCode == 400 || response.statusCode == 409) {
+        emit(RegisterFailure("⚠️ Email or phone number already exists."));
       } else {
-        print("Network Error: ${error.message}");
-        emit(RegisterFailure("Network error. Check your connection."));
+        emit(RegisterFailure("⚠️ Unexpected response from server."));
+      }
+    } on DioException catch (error) {
+      print("🔴 DioException occurred: ${error.response?.data}");
+
+      if (error.response != null) {
+        String errorMessage = error.response!.data is Map<String, dynamic>
+            ? error.response!.data["message"] ?? "Unknown error"
+            : "Unexpected server response.";
+
+        emit(RegisterFailure("❌ Server error: $errorMessage"));
+      } else {
+        emit(RegisterFailure("❌ Network error, check your connection."));
       }
     } catch (error) {
-      print("Unexpected Error: $error");
-      emit(RegisterFailure("An unexpected error occurred: $error"));
+      print("🔴 Unknown Error: $error");
+      emit(RegisterFailure("❌ Unexpected error occurred."));
     }
   }
 }

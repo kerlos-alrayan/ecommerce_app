@@ -162,7 +162,6 @@ class CategoryScreen extends StatelessWidget {
                         ),
                       );
                     });
-                ;
               }
               if (state is CategoryProductsFailure) {
                 return Center(

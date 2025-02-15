@@ -9,7 +9,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 class SingleProductScreen extends StatefulWidget {
   final int id;
   final String name;
-  SingleProductScreen({required this.id, required this.name});
+  const SingleProductScreen({super.key, required this.id, required this.name});
 
   @override
   State<SingleProductScreen> createState() => _SingleProductScreenState();

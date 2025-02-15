@@ -10,5 +10,8 @@ class BottomBarInitial extends BottomBarState {
 class BottomBarChange extends BottomBarState {
   BottomBarChange(super.index);
 }
+class ClearBottomBarChange extends BottomBarState {
+  ClearBottomBarChange(super.index);
+}
 
 

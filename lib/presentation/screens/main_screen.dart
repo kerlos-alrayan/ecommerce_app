@@ -310,95 +310,109 @@ class _MainScreenState extends State<MainScreen> {
           );
         }
         if (state is HomeDataSuccess) {
-          final homeData = state.homeResponse.data.products;
+          final homeData = state.homeResponse.data.products.where((product) {
+            final discount = product.discount;
+            final discountValue = discount is num
+                ? discount
+                : int.tryParse(discount.toString()) ?? 0;
+            return discountValue > 0;
+          }).toList();
+
+          if (homeData.isEmpty) {
+            return Center(
+              child: Text(
+                'There are no products currently on discount',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            );
+          }
+
           return Container(
             margin: EdgeInsets.only(top: 12, left: 16),
             child: SizedBox(
               height: 238,
               child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  physics: ScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: homeData.length,
-                  itemBuilder: (context, indexItem) {
-                    final homeItems = homeData[indexItem];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => SingleProductScreen(
-                                  id: 1,
-                                  name: homeItems.name,
-                                )));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Container(
-                          width: 141,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              width: 1,
-                              color: Color(0xffEBF0FF),
-                            ),
+                scrollDirection: Axis.horizontal,
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: homeData.length,
+                itemBuilder: (context, indexItem) {
+                  final homeItems = homeData[indexItem];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => SingleProductScreen(
+                                id: homeItems.id,
+                                name: homeItems.name,
+                              )));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: Container(
+                        width: 141,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            width: 1,
+                            color: Color(0xffEBF0FF),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Center(
-                                    child: Image.network(
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Image.network(
                                   homeItems.image,
                                   width: 109,
                                   height: 109,
-                                )),
-                                SizedBox(
-                                  height: 8,
                                 ),
-                                // Title
-                                Text(
-                                  homeItems.name,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins',
-                                    color: Color(0xff223263),
-                                  ),
+                              ),
+                              SizedBox(height: 8),
+                              // Title
+                              Text(
+                                homeItems.name,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins',
+                                  color: Color(0xff223263),
                                 ),
-                                Spacer(),
-                                // Price
-                                Text(
-                                  'EGP ${homeItems.price}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins',
-                                    color: Color(0xff40BFFF),
-                                  ),
+                              ),
+                              Spacer(),
+                              // Price
+                              Text(
+                                'EGP ${homeItems.price}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins',
+                                  color: Color(0xff40BFFF),
                                 ),
-                                SizedBox(
-                                  height: 4,
-                                ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      'EGP ${homeItems.oldPrice}',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 10,
-                                        fontFamily: 'Poppins',
-                                        color: Color(0xff9098B1),
-                                      ),
+                              ),
+                              SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Text(
+                                    'EGP ${homeItems.oldPrice}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10,
+                                      fontFamily: 'Poppins',
+                                      color: Color(0xff9098B1),
+                                      decoration: TextDecoration.lineThrough,
                                     ),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    // Discount
-                                    Text(
+                                  ),
+                                  SizedBox(width: 8),
+                                  // Discount
+                                  Expanded(
+                                    child: Text(
                                       '${homeItems.discount}% off',
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 10,
@@ -406,15 +420,17 @@ class _MainScreenState extends State<MainScreen> {
                                         color: Color(0xffFB7181),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    );
-                  }),
+                    ),
+                  );
+                },
+              ),
             ),
           );
         }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lafyuu/cubits/PasswordVisibility_cubit/PasswordVisibility_cubit.dart';
+import 'package:lafyuu/cubits/profile_cubit/profile_cubit.dart';
+import 'package:lafyuu/presentation/screens/init_screens/account_screens/account_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/account_screens/profile.dart';
 import 'package:lafyuu/presentation/screens/init_screens/splash_screen.dart';
 import 'helper/dio_helper.dart';
 import 'package:lafyuu/cubits/bottom_bar_cubit/bottom_bar_cubit.dart';
@@ -28,12 +32,14 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => BottomBarCubit()),
-        BlocProvider(create: (context) => HomeProductCubit()),
+        BlocProvider(create: (context) => HomeProductCubit()..getHomeProducts()),
         BlocProvider(create: (context) => ProductDetailsCubit()),
         BlocProvider(create: (context) => LoginCubit()),
         BlocProvider(create: (context) => RegisterCubit()),
         BlocProvider(create: (context) => CategoriesCubit()..fetchCategories()),
         BlocProvider(create: (context) => CategoryProductCubit()),
+        BlocProvider(create: (context) => PasswordVisibilityCubit()),
+        BlocProvider(create: (context) => ProfileCubit()..getProfileData()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -1,4 +1,4 @@
-import 'package:lafyuu/presentation/screens/init_screens/account_screen.dart';
+import 'package:lafyuu/presentation/screens/init_screens/account_screens/account_screen.dart';
 import 'package:lafyuu/presentation/screens/init_screens/cart_screen.dart';
 import 'package:lafyuu/presentation/screens/init_screens/explore_screen.dart';
 import 'package:lafyuu/presentation/screens/main_screen.dart';

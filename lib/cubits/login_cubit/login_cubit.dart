@@ -4,6 +4,7 @@ import 'package:lafyuu/constants/api_constants.dart';
 import 'package:lafyuu/helper/shared_prefs_helper.dart';
 import 'package:lafyuu/models/login_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lafyuu/presentation/screens/auth_screens/login_screen.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,7 +15,10 @@ class LoginCubit extends Cubit<LoginState> {
 
   static LoginCubit get(context) => BlocProvider.of(context);
 
-  void userLogin({ required BuildContext context,required String email, required String password}) async {
+  void userLogin(
+      {required BuildContext context,
+      required String email,
+      required String password}) async {
     emit(LoginLoading());
 
     try {
@@ -76,4 +80,13 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
+  Future<void> logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (route) => false,
+    );
+  }
 }

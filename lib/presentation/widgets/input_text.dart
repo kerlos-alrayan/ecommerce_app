@@ -1,75 +1,80 @@
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatefulWidget {
-  const CustomTextFormField(
-      {super.key,
-        this.hintText,
-        this.label,
-        this.prefix,
-        required this.isPassword,
-        this.onChange,
-        this.validator,
-        required this.controller});
-  final String? hintText;
-  final String? label;
-  final Function(String)? onChange;
-  final FormFieldValidator<String>? validator;
-  final IconData? prefix;
+  const CustomTextFormField({
+    super.key,
+    required this.hintText,
+    this.maxLines = 1,
+    this.onSaved,
+    this.onChange,
+    this.controller,
+    this.borderColor = Colors.grey,
+    required this.labelText,
+    this.prefixIcon,
+    this.prefixIconColor,
+    this.validator,
+    this.isPassword = false, this.suffixIcon, required this.textInputAction,
+  }); // Added borderColor parameter
+  final String labelText;
+  final String hintText;
+  final TextEditingController? controller;
+  final int maxLines;
+  final void Function(String?)? onSaved;
+  final void Function(String)? onChange;
+  final Color borderColor; // Added borderColor property
+  final IconData? prefixIcon;
+  final Widget? suffixIcon;
+  final Color? prefixIconColor;
+  final String? Function(String?)? validator;
   final bool isPassword;
-  final TextEditingController controller;
+  final TextInputAction textInputAction;
+
   @override
-  State<CustomTextFormField> createState() => _CustomTextFormFieldState();
+  State<CustomTextFormField> createState() => _CustomTextFieldState();
 }
 
-class _CustomTextFormFieldState extends State<CustomTextFormField> {
-  final bool _isObscure = true;
+class _CustomTextFieldState extends State<CustomTextFormField> {
+  bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
-    final defaultPadding = EdgeInsets.symmetric(horizontal: 15);
+    final defaultPadding = const EdgeInsets.symmetric(horizontal: 0);
     return Padding(
       padding: defaultPadding,
       child: TextFormField(
-        autofocus: false,
-        onTapOutside: (event) {
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
-        onFieldSubmitted: (event) {
-          FocusManager.instance.primaryFocus?.nextFocus();
-        },
+        textInputAction: widget.textInputAction,
+        obscureText: widget.isPassword ? _obscureText : false,
         controller: widget.controller,
-        obscureText: widget.isPassword ? _isObscure : false,
         onChanged: widget.onChange,
+        onSaved: widget.onSaved,
         validator: widget.validator,
+        cursorColor: Colors.black,
+        maxLines: widget.maxLines,
         decoration: InputDecoration(
-            hintText: widget.hintText,
-            enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade500),
-                borderRadius: BorderRadius.circular(15)),
-            focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.blueAccent),
-                borderRadius: BorderRadius.circular(15)),
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.all(5),
-            prefixIcon: widget.prefix != null
-                ? Icon(widget.prefix, color: Colors.grey)
-                : null,
-            suffix: widget.isPassword == true
-                ? IconButton(
-                onPressed: () {
-                  setState(() {
-                    _isObscure != _isObscure;
-                  });
-                },
-                icon: Icon(
-                    _isObscure ? Icons.visibility : Icons.visibility_off))
-                : null,
-            labelText: widget.label,
-            prefixIconColor: Colors.grey[400],
-            suffixIconColor: Colors.blue,
-            hintStyle: TextStyle(color: Colors.grey),
-            filled: true,
-            fillColor: Colors.white),
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+          filled: true,
+          fillColor: Colors.white,
+          labelText: widget.labelText, // Hint integrated into the border
+          hintText: widget.hintText,
+          hintStyle: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Poppins',
+              color: Color(0xff9098B1)),
+          border: buildBorder(widget.borderColor),
+          enabledBorder: buildBorder(widget.borderColor),
+          focusedBorder: buildBorder(const Color(0xFF478ecc)),
+          prefixIcon: Icon(widget.prefixIcon, color: Color(0xff9098B1)),
+          prefixIconColor: widget.prefixIconColor,
+          suffixIcon: widget.suffixIcon,
+        ),
       ),
+    );
+  }
+
+  OutlineInputBorder buildBorder(Color color) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(5),
+      borderSide: BorderSide(color: Color(0xffEBF0FF)), // Use color parameter
     );
   }
 }
